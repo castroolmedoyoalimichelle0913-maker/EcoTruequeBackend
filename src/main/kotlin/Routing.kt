@@ -1,36 +1,28 @@
 package com.example
 
-import com.example.models.Trueque
+import com.example.routes.materialRoutes
+import com.example.routes.usuarioRoutes
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
-
     routing {
 
         get("/") {
-            call.respondText("EcoTrueque funcionando")
+            call.respondText("🌱 EcoTrueque Backend funcionando")
         }
 
-        get("/api/trueques") {
+        usuarioRoutes()
+        materialRoutes()
 
-            val lista = listOf(
-
-                Trueque(
-                    id = 1,
-                    producto = "Botellas recicladas",
-                    usuario = "Ana"
-                ),
-
-                Trueque(
-                    id = 2,
-                    producto = "Cartón reutilizable",
-                    usuario = "Carlos"
+        authenticate("auth-jwt") {
+            get("/perfil") {
+                call.respond(
+                    mapOf("mensaje" to "Acceso autorizado")
                 )
-            )
-
-            call.respond(lista)
+            }
         }
     }
 }
