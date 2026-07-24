@@ -15,5 +15,9 @@ data class Material(
 
     val puntos: Int,
 
-    val imagen: String? = null
+    val imagen: String? = null,
+
+    val latitud: Double? = null,
+
+    val longitud: Double? = null
 )

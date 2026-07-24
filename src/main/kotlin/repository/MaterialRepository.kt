@@ -16,7 +16,9 @@ class MaterialRepository {
                 descripcion = it[Materiales.descripcion],
                 categoria = it[Materiales.categoria],
                 puntos = it[Materiales.puntos],
-                imagen = it[Materiales.imagen]
+                imagen = it[Materiales.imagen],
+                latitud = it[Materiales.latitud],
+                longitud = it[Materiales.longitud]
             )
         }
     }
@@ -35,7 +37,9 @@ class MaterialRepository {
                     descripcion = it[Materiales.descripcion],
                     categoria = it[Materiales.categoria],
                     puntos = it[Materiales.puntos],
-                    imagen = it[Materiales.imagen]
+                    imagen = it[Materiales.imagen],
+                    latitud = it[Materiales.latitud],
+                    longitud = it[Materiales.longitud]
                 )
             }
     }
@@ -47,6 +51,8 @@ class MaterialRepository {
             it[categoria] = material.categoria
             it[puntos] = material.puntos
             it[imagen] = material.imagen
+            it[latitud] = material.latitud
+            it[longitud] = material.longitud
         }
     }
 
@@ -57,6 +63,8 @@ class MaterialRepository {
             it[categoria] = material.categoria
             it[puntos] = material.puntos
             it[imagen] = material.imagen
+            it[latitud] = material.latitud
+            it[longitud] = material.longitud
         } > 0
     }
 
