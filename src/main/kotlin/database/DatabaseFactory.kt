@@ -57,12 +57,28 @@ object DatabaseFactory {
         Database.connect(dataSource)
 
         transaction {
-            SchemaUtils.createMissingTablesAndColumns(
-                Usuarios,
-                Materiales,
-                Recompensas,
-                Trueques
-            )
+            try {
+                SchemaUtils.createMissingTablesAndColumns(
+                    Usuarios,
+                    Materiales,
+                    Recompensas,
+                    Trueques
+                )
+                application.log.info("Schema actualizado correctamente")
+            } catch (e: Exception) {
+                application.log.warn("createMissingTablesAndColumns fallo: ${e.message}, intentando create...")
+                try {
+                    SchemaUtils.create(
+                        Usuarios,
+                        Materiales,
+                        Recompensas,
+                        Trueques
+                    )
+                    application.log.info("Tablas creadas con create()")
+                } catch (e2: Exception) {
+                    application.log.error("Error en base de datos: ${e2.message}")
+                }
+            }
         }
 
         application.log.info("Base de datos conectada correctamente")

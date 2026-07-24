@@ -20,65 +20,79 @@ fun Route.usuarioRoutes() {
     route("/usuarios") {
 
         post("/registro") {
-            val usuario = call.receive<Usuario>()
+            try {
+                val usuario = call.receive<Usuario>()
 
-            val existente = repository.buscarPorCorreo(usuario.correo)
+                val existente = repository.buscarPorCorreo(usuario.correo)
 
-            if (existente != null) {
+                if (existente != null) {
+                    call.respond(
+                        HttpStatusCode.Conflict,
+                        mapOf("error" to "Ese correo ya esta registrado")
+                    )
+                    return@post
+                }
+
+                repository.registrar(usuario)
+
                 call.respond(
-                    HttpStatusCode.Conflict,
-                    mapOf("error" to "Ese correo ya está registrado")
+                    HttpStatusCode.Created,
+                    mapOf("mensaje" to "Usuario registrado correctamente")
                 )
-                return@post
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    mapOf("error" to "Error al registrar usuario: ${e.message}")
+                )
             }
-
-            repository.registrar(usuario)
-
-            call.respond(
-                HttpStatusCode.Created,
-                mapOf("mensaje" to "Usuario registrado correctamente")
-            )
         }
 
         post("/login") {
-            val request = call.receive<LoginRequest>()
+            try {
+                val request = call.receive<LoginRequest>()
 
-            val usuario = repository.buscarPorCorreo(request.correo)
+                val usuario = repository.buscarPorCorreo(request.correo)
 
-            if (usuario == null) {
+                if (usuario == null) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        mapOf("error" to "Usuario no encontrado")
+                    )
+                    return@post
+                }
+
+                val passwordCorrecta = PasswordUtils.verify(
+                    request.password,
+                    usuario[Usuarios.password]
+                )
+
+                if (!passwordCorrecta) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        mapOf("error" to "Contrasena incorrecta")
+                    )
+                    return@post
+                }
+
+                val token = JwtService.generateToken(
+                    id = usuario[Usuarios.id].value,
+                    correo = usuario[Usuarios.correo]
+                )
+
                 call.respond(
-                    HttpStatusCode.NotFound,
-                    mapOf("error" to "Usuario no encontrado")
+                    LoginResponse(
+                        token = token,
+                        nombre = usuario[Usuarios.nombre],
+                        correo = usuario[Usuarios.correo],
+                        puntos = usuario[Usuarios.puntos]
+                    )
                 )
-                return@post
-            }
-
-            val passwordCorrecta = PasswordUtils.verify(
-                request.password,
-                usuario[Usuarios.password]
-            )
-
-            if (!passwordCorrecta) {
+            } catch (e: Exception) {
                 call.respond(
-                    HttpStatusCode.Unauthorized,
-                    mapOf("error" to "Contraseña incorrecta")
+                    HttpStatusCode.InternalServerError,
+                    mapOf("error" to "Error en login: ${e.message}")
                 )
-                return@post
             }
-
-            val token = JwtService.generateToken(
-                id = usuario[Usuarios.id].value,
-                correo = usuario[Usuarios.correo]
-            )
-
-            call.respond(
-                LoginResponse(
-                    token = token,
-                    nombre = usuario[Usuarios.nombre],
-                    correo = usuario[Usuarios.correo],
-                    puntos = usuario[Usuarios.puntos]
-                )
-            )
         }
     }
 }

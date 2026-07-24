@@ -18,7 +18,14 @@ fun Route.materialRoutes() {
         route("/materiales") {
 
             get {
-                call.respond(repository.obtenerTodos())
+                try {
+                    call.respond(repository.obtenerTodos())
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al obtener materiales: ${e.message}")
+                    )
+                }
             }
 
             get("/{id}") {
@@ -40,50 +47,71 @@ fun Route.materialRoutes() {
             }
 
             post {
-                val material = call.receive<Material>()
-                repository.insertar(material)
+                try {
+                    val material = call.receive<Material>()
+                    repository.insertar(material)
 
-                call.respond(
-                    HttpStatusCode.Created,
-                    mapOf("mensaje" to "Material agregado")
-                )
+                    call.respond(
+                        HttpStatusCode.Created,
+                        mapOf("mensaje" to "Material agregado")
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al crear material: ${e.message}")
+                    )
+                }
             }
 
             put("/{id}") {
                 val id = call.parameters["id"]?.toIntOrNull()
 
                 if (id == null) {
-                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID inválido"))
+                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID invalido"))
                     return@put
                 }
 
-                val material = call.receive<Material>()
-                val actualizado = repository.actualizar(id, material)
+                try {
+                    val material = call.receive<Material>()
+                    val actualizado = repository.actualizar(id, material)
 
-                if (!actualizado) {
-                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "Material no encontrado"))
-                    return@put
+                    if (!actualizado) {
+                        call.respond(HttpStatusCode.NotFound, mapOf("error" to "Material no encontrado"))
+                        return@put
+                    }
+
+                    call.respond(mapOf("mensaje" to "Material actualizado"))
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al actualizar material: ${e.message}")
+                    )
                 }
-
-                call.respond(mapOf("mensaje" to "Material actualizado"))
             }
 
             delete("/{id}") {
                 val id = call.parameters["id"]?.toIntOrNull()
 
                 if (id == null) {
-                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID inválido"))
+                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID invalido"))
                     return@delete
                 }
 
-                val eliminado = repository.eliminar(id)
+                try {
+                    val eliminado = repository.eliminar(id)
 
-                if (!eliminado) {
-                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "Material no encontrado"))
-                    return@delete
+                    if (!eliminado) {
+                        call.respond(HttpStatusCode.NotFound, mapOf("error" to "Material no encontrado"))
+                        return@delete
+                    }
+
+                    call.respond(mapOf("mensaje" to "Material eliminado"))
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al eliminar material: ${e.message}")
+                    )
                 }
-
-                call.respond(mapOf("mensaje" to "Material eliminado"))
             }
         }
     }
