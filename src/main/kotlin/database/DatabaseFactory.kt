@@ -83,6 +83,11 @@ object DatabaseFactory {
                 exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS longitud DOUBLE NULL")
                 application.log.info("Columna longitud agregada")
             } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS usuario_id INT NULL")
+                application.log.info("Columna usuario_id agregada")
+            } catch (_: Exception) {}
         }
 
         application.log.info("Base de datos conectada correctamente")

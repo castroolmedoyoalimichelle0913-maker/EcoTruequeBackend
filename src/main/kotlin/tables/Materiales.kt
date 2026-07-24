@@ -8,7 +8,8 @@ object Materiales : IntIdTable("materiales") {
     val descripcion = varchar("descripcion", 255)
     val categoria = varchar("categoria", 80)
     val puntos = integer("puntos")
-    val imagen = mediumText("imagen").nullable()
+    val imagen = text("imagen").nullable()
     val latitud = double("latitud").nullable()
     val longitud = double("longitud").nullable()
+    val usuarioId = integer("usuario_id").nullable()
 }

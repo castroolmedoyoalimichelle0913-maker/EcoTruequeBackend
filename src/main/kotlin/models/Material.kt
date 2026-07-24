@@ -1,5 +1,6 @@
 package com.example.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,5 +20,8 @@ data class Material(
 
     val latitud: Double? = null,
 
-    val longitud: Double? = null
+    val longitud: Double? = null,
+
+    @SerialName("usuario_id")
+    val usuarioId: Int? = null
 )
