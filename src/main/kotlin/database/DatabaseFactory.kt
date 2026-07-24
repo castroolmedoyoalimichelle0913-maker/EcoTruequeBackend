@@ -66,19 +66,23 @@ object DatabaseFactory {
                 )
                 application.log.info("Schema actualizado correctamente")
             } catch (e: Exception) {
-                application.log.warn("createMissingTablesAndColumns fallo: ${e.message}, intentando create...")
-                try {
-                    SchemaUtils.create(
-                        Usuarios,
-                        Materiales,
-                        Recompensas,
-                        Trueques
-                    )
-                    application.log.info("Tablas creadas con create()")
-                } catch (e2: Exception) {
-                    application.log.error("Error en base de datos: ${e2.message}")
-                }
+                application.log.warn("createMissingTablesAndColumns fallo: ${e.message}")
             }
+
+            try {
+                exec("ALTER TABLE materiales MODIFY COLUMN imagen TEXT NULL")
+                application.log.info("Columna imagen cambiada a TEXT")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS latitud DOUBLE NULL")
+                application.log.info("Columna latitud agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS longitud DOUBLE NULL")
+                application.log.info("Columna longitud agregada")
+            } catch (_: Exception) {}
         }
 
         application.log.info("Base de datos conectada correctamente")
