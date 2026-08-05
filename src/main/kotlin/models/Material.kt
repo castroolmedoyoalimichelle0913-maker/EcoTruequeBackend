@@ -23,5 +23,17 @@ data class Material(
     val longitud: Double? = null,
 
     @SerialName("usuario_id")
-    val usuarioId: Int? = null
+    val usuarioId: Int? = null,
+
+    @SerialName("fecha_publicacion")
+    val fechaPublicacion: String? = null,
+
+    @SerialName("usuario_nombre")
+    val usuarioNombre: String? = null,
+
+    @SerialName("usuario_foto")
+    val usuarioFoto: String? = null,
+
+    @SerialName("usuario_puntos")
+    val usuarioPuntos: Int? = null
 )

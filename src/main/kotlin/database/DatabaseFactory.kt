@@ -1,9 +1,16 @@
 package com.example.database
 
+import com.example.repository.InsigniaRepository
+import com.example.tables.Chats
+import com.example.tables.Insignias
 import com.example.tables.Materiales
+import com.example.tables.Mensajes
+import com.example.tables.Notificaciones
+import com.example.tables.Propuestas
 import com.example.tables.Recompensas
 import com.example.tables.Trueques
 import com.example.tables.Usuarios
+import com.example.tables.UsuarioInsignias
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
@@ -62,7 +69,13 @@ object DatabaseFactory {
                     Usuarios,
                     Materiales,
                     Recompensas,
-                    Trueques
+                    Trueques,
+                    Propuestas,
+                    Chats,
+                    Mensajes,
+                    Notificaciones,
+                    Insignias,
+                    UsuarioInsignias
                 )
                 application.log.info("Schema actualizado correctamente")
             } catch (e: Exception) {
@@ -88,6 +101,66 @@ object DatabaseFactory {
                 exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS usuario_id INT NULL")
                 application.log.info("Columna usuario_id agregada")
             } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS fecha_publicacion VARCHAR(30) DEFAULT ''")
+                application.log.info("Columna fecha_publicacion agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS foto_perfil TEXT NULL")
+                application.log.info("Columna foto_perfil agregada")
+            } catch (_: Exception) {}
+        }
+
+        transaction {
+            try {
+                val insigniaRepository = InsigniaRepository()
+
+                insigniaRepository.insertarSiNoExiste(
+                    nombre = "Primer intercambio",
+                    descripcion = "Completaste tu primer trueque",
+                    imagen = "🌱",
+                    requerimiento = "trueques",
+                    cantidadRequerida = 1
+                )
+
+                insigniaRepository.insertarSiNoExiste(
+                    nombre = "Intercambiador activo",
+                    descripcion = "Completaste 5 intercambios",
+                    imagen = "🔄",
+                    requerimiento = "trueques",
+                    cantidadRequerida = 5
+                )
+
+                insigniaRepository.insertarSiNoExiste(
+                    nombre = "Recién llegado",
+                    descripcion = "Publicaste tu primer artículo",
+                    imagen = "📦",
+                    requerimiento = "materiales",
+                    cantidadRequerida = 1
+                )
+
+                insigniaRepository.insertarSiNoExiste(
+                    nombre = "Gran aportador",
+                    descripcion = "Publicaste 10 artículos",
+                    imagen = "⭐",
+                    requerimiento = "materiales",
+                    cantidadRequerida = 10
+                )
+
+                insigniaRepository.insertarSiNoExiste(
+                    nombre = "100 créditos verdes",
+                    descripcion = "Acumulaste 100 puntos verdes",
+                    imagen = "💚",
+                    requerimiento = "puntos",
+                    cantidadRequerida = 100
+                )
+
+                application.log.info("Insignias verificadas")
+            } catch (e: Exception) {
+                application.log.warn("No se pudieron crear insignias: ${e.message}")
+            }
         }
 
         application.log.info("Base de datos conectada correctamente")

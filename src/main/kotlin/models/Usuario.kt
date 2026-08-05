@@ -1,5 +1,6 @@
 package com.example.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,5 +18,8 @@ data class Usuario(
 
     val puntos: Int = 0,
 
-    val fechaRegistro: String
+    val fechaRegistro: String,
+
+    @SerialName("foto_perfil")
+    val fotoPerfil: String? = null
 )

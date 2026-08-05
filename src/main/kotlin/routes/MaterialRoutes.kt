@@ -67,7 +67,12 @@ fun Route.materialRoutes() {
                     val userId = principal.payload.getClaim("id").asInt()
 
                     val material = call.receive<Material>()
-                    val materialConUsuario = material.copy(usuarioId = userId)
+                    val ahora = java.time.LocalDateTime.now()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                    val materialConUsuario = material.copy(
+                        usuarioId = userId,
+                        fechaPublicacion = material.fechaPublicacion ?: ahora
+                    )
                     repository.insertar(materialConUsuario)
 
                     call.respond(

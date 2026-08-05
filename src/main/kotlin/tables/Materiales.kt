@@ -12,4 +12,5 @@ object Materiales : IntIdTable("materiales") {
     val latitud = double("latitud").nullable()
     val longitud = double("longitud").nullable()
     val usuarioId = integer("usuario_id").nullable()
+    val fechaPublicacion = varchar("fecha_publicacion", 30).default("")
 }

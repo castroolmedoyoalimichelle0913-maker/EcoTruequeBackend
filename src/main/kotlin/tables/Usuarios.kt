@@ -10,4 +10,5 @@ object Usuarios : IntIdTable("usuarios") {
     val telefono = varchar("telefono", 20).nullable()
     val puntos = integer("puntos").default(0)
     val fechaRegistro = varchar("fecha_registro", 30)
+    val fotoPerfil = text("foto_perfil").nullable()
 }

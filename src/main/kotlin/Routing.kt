@@ -1,6 +1,11 @@
 package com.example
 
+import com.example.routes.chatRoutes
+import com.example.routes.insigniaRoutes
 import com.example.routes.materialRoutes
+import com.example.routes.miPerfilRoutes
+import com.example.routes.notificacionRoutes
+import com.example.routes.propuestaRoutes
 import com.example.routes.usuarioRoutes
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -15,7 +20,12 @@ fun Application.configureRouting() {
         }
 
         usuarioRoutes()
+        miPerfilRoutes()
         materialRoutes()
+        propuestaRoutes()
+        chatRoutes()
+        notificacionRoutes()
+        insigniaRoutes()
 
         authenticate("auth-jwt") {
             get("/perfil") {

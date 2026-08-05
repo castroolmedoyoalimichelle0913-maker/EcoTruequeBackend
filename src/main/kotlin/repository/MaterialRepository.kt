@@ -2,6 +2,7 @@ package com.example.repository
 
 import com.example.models.Material
 import com.example.tables.Materiales
+import com.example.tables.Usuarios
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -9,11 +10,16 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class MaterialRepository {
 
     fun obtenerTodos(): List<Material> = transaction {
-        Materiales.selectAll().map { rowToMaterial(it) }
+        Materiales
+            .leftJoin(Usuarios, { Materiales.usuarioId }, { Usuarios.id })
+            .selectAll()
+            .orderBy(Materiales.id, SortOrder.DESC)
+            .map { rowToMaterial(it) }
     }
 
     fun obtenerPorId(id: Int): Material? = transaction {
         Materiales
+            .leftJoin(Usuarios, { Materiales.usuarioId }, { Usuarios.id })
             .selectAll()
             .where { Materiales.id eq id }
             .limit(1)
@@ -23,8 +29,10 @@ class MaterialRepository {
 
     fun obtenerPorUsuario(usuarioId: Int): List<Material> = transaction {
         Materiales
+            .leftJoin(Usuarios, { Materiales.usuarioId }, { Usuarios.id })
             .selectAll()
             .where { Materiales.usuarioId eq usuarioId }
+            .orderBy(Materiales.id, SortOrder.DESC)
             .map { rowToMaterial(it) }
     }
 
@@ -38,6 +46,7 @@ class MaterialRepository {
             it[latitud] = material.latitud
             it[longitud] = material.longitud
             it[usuarioId] = material.usuarioId
+            it[fechaPublicacion] = material.fechaPublicacion ?: ""
         }[Materiales.id].value
     }
 
@@ -67,7 +76,11 @@ class MaterialRepository {
             imagen = row[Materiales.imagen],
             latitud = row[Materiales.latitud],
             longitud = row[Materiales.longitud],
-            usuarioId = row[Materiales.usuarioId]
+            usuarioId = row[Materiales.usuarioId],
+            fechaPublicacion = row.getOrNull(Materiales.fechaPublicacion),
+            usuarioNombre = row.getOrNull(Usuarios.nombre),
+            usuarioFoto = row.getOrNull(Usuarios.fotoPerfil),
+            usuarioPuntos = row.getOrNull(Usuarios.puntos)
         )
     }
 }
