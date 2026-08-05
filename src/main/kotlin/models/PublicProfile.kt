@@ -16,5 +16,11 @@ data class PublicProfile(
     @SerialName("numero_materiales")
     val numeroMateriales: Int,
     @SerialName("numero_trueques")
-    val numeroTrueques: Int
+    val numeroTrueques: Int,
+    val rol: String = "usuario",
+    val activo: Boolean = true,
+    @SerialName("notificaciones")
+    val notificaciones: Boolean = true,
+    @SerialName("numero_insignias")
+    val numeroInsignias: Int = 0
 )

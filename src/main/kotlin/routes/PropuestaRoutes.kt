@@ -89,7 +89,7 @@ fun Route.propuestaRoutes() {
                     )
 
                     val receptor = usuarioRepository.obtenerPorId(receptorId)
-                    notificacionRepository.crear(
+                    notificacionRepository.crearSiActivadas(
                         usuarioId = receptorId,
                         tipo = "propuesta",
                         titulo = "Nueva propuesta de intercambio",
@@ -135,13 +135,16 @@ fun Route.propuestaRoutes() {
 
                     repository.actualizarEstado(id, "En proceso")
 
+                    materialRepository.marcarEstado(propuesta[Propuestas.materialOfertaId], "reservado")
+                    materialRepository.marcarEstado(propuesta[Propuestas.materialDeseadoId], "reservado")
+
                     val ahora = LocalDateTime.now().format(formato)
                     val oferenteId = propuesta[Propuestas.oferenteId]
                     val receptorId = propuesta[Propuestas.receptorId]
                     chatRepository.crear(id, oferenteId, receptorId, ahora)
 
                     val receptor = usuarioRepository.obtenerPorId(receptorId)
-                    notificacionRepository.crear(
+                    notificacionRepository.crearSiActivadas(
                         usuarioId = oferenteId,
                         tipo = "aceptar",
                         titulo = "Propuesta aceptada",
@@ -182,8 +185,11 @@ fun Route.propuestaRoutes() {
 
                     repository.actualizarEstado(id, "Rechazado")
 
+                    materialRepository.marcarEstado(propuesta[Propuestas.materialOfertaId], "disponible")
+                    materialRepository.marcarEstado(propuesta[Propuestas.materialDeseadoId], "disponible")
+
                     val ahora = LocalDateTime.now().format(formato)
-                    notificacionRepository.crear(
+                    notificacionRepository.crearSiActivadas(
                         usuarioId = propuesta[Propuestas.oferenteId],
                         tipo = "rechazar",
                         titulo = "Propuesta rechazada",
@@ -232,6 +238,9 @@ fun Route.propuestaRoutes() {
 
                     repository.actualizarEstado(id, "Completado")
 
+                    materialRepository.marcarEstado(propuesta[Propuestas.materialOfertaId], "intercambiado")
+                    materialRepository.marcarEstado(propuesta[Propuestas.materialDeseadoId], "intercambiado")
+
                     val ahora = LocalDateTime.now().format(formato)
 
                     val materialOferta = materialRepository.obtenerPorId(propuesta[Propuestas.materialOfertaId])
@@ -243,7 +252,7 @@ fun Route.propuestaRoutes() {
                     if (puntosOferente > 0) usuarioRepository.sumarPuntos(oferenteId, puntosOferente)
                     if (puntosReceptor > 0) usuarioRepository.sumarPuntos(receptorId, puntosReceptor)
 
-                    notificacionRepository.crear(
+                    notificacionRepository.crearSiActivadas(
                         usuarioId = oferenteId,
                         tipo = "completar",
                         titulo = "Intercambio completado",
@@ -251,7 +260,7 @@ fun Route.propuestaRoutes() {
                         fecha = ahora
                     )
 
-                    notificacionRepository.crear(
+                    notificacionRepository.crearSiActivadas(
                         usuarioId = receptorId,
                         tipo = "completar",
                         titulo = "Intercambio completado",

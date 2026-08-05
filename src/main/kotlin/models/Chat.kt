@@ -8,7 +8,7 @@ data class Chat(
     val id: Int? = null,
 
     @SerialName("propuesta_id")
-    val propuestaId: Int,
+    val propuestaId: Int? = null,
 
     @SerialName("usuario1_id")
     val usuario1Id: Int,

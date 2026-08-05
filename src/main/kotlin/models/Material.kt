@@ -35,5 +35,9 @@ data class Material(
     val usuarioFoto: String? = null,
 
     @SerialName("usuario_puntos")
-    val usuarioPuntos: Int? = null
+    val usuarioPuntos: Int? = null,
+
+    val etiquetas: String? = null,
+
+    val estado: String? = null
 )

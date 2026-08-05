@@ -1,6 +1,7 @@
 package com.example.database
 
 import com.example.repository.InsigniaRepository
+import com.example.tables.Bitacora
 import com.example.tables.Chats
 import com.example.tables.Insignias
 import com.example.tables.Materiales
@@ -8,6 +9,7 @@ import com.example.tables.Mensajes
 import com.example.tables.Notificaciones
 import com.example.tables.Propuestas
 import com.example.tables.Recompensas
+import com.example.tables.Reportes
 import com.example.tables.Trueques
 import com.example.tables.Usuarios
 import com.example.tables.UsuarioInsignias
@@ -75,7 +77,9 @@ object DatabaseFactory {
                     Mensajes,
                     Notificaciones,
                     Insignias,
-                    UsuarioInsignias
+                    UsuarioInsignias,
+                    Reportes,
+                    Bitacora
                 )
                 application.log.info("Schema actualizado correctamente")
             } catch (e: Exception) {
@@ -110,6 +114,36 @@ object DatabaseFactory {
             try {
                 exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS foto_perfil TEXT NULL")
                 application.log.info("Columna foto_perfil agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS rol VARCHAR(20) DEFAULT 'usuario'")
+                application.log.info("Columna rol agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS activo BOOLEAN DEFAULT TRUE")
+                application.log.info("Columna activo agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS notificaciones BOOLEAN DEFAULT TRUE")
+                application.log.info("Columna notificaciones agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS etiquetas VARCHAR(255) DEFAULT ''")
+                application.log.info("Columna etiquetas agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS estado VARCHAR(30) DEFAULT 'disponible'")
+                application.log.info("Columna estado agregada")
+            } catch (_: Exception) {}
+
+            try {
+                exec("ALTER TABLE chats MODIFY COLUMN propuesta_id INT NULL")
+                application.log.info("Columna propuesta_id de chats ahora es nullable")
             } catch (_: Exception) {}
         }
 

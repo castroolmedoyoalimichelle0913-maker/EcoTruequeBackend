@@ -72,6 +72,38 @@ fun Route.chatRoutes() {
                 call.respond(chat)
             }
 
+            post("/directo") {
+                try {
+                    val principal = call.principal<JWTPrincipal>()!!
+                    val userId = principal.payload.getClaim("id").asInt()
+
+                    val request = call.receive<Map<String, Int>>()
+                    val otroUsuarioId = request["otroUsuarioId"]
+
+                    if (otroUsuarioId == null || otroUsuarioId == userId) {
+                        call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Destinatario invalido"))
+                        return@post
+                    }
+
+                    val otro = usuarioRepository.obtenerPorId(otroUsuarioId)
+                    if (otro == null) {
+                        call.respond(HttpStatusCode.NotFound, mapOf("error" to "Usuario no encontrado"))
+                        return@post
+                    }
+
+                    val ahora = LocalDateTime.now().format(formato)
+                    val chatId = repository.crearDirecto(userId, otroUsuarioId, ahora)
+
+                    val chat = repository.obtenerPorIdUsuario(chatId)
+                    call.respond(chat ?: mapOf("chatId" to chatId))
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al crear conversacion: ${e.message}")
+                    )
+                }
+            }
+
             get("/{chatId}/mensajes") {
                 val chatId = call.parameters["chatId"]?.toIntOrNull()
                 if (chatId == null) {
@@ -119,7 +151,7 @@ fun Route.chatRoutes() {
                     if (chat != null) {
                         val otroId = if (chat.usuario1Id == emisorId) chat.usuario2Id else chat.usuario1Id
                         val otro = usuarioRepository.obtenerPorId(otroId)
-                        notificacionRepository.crear(
+                        notificacionRepository.crearSiActivadas(
                             usuarioId = otroId,
                             tipo = "mensaje",
                             titulo = "Nuevo mensaje",

@@ -11,4 +11,7 @@ object Usuarios : IntIdTable("usuarios") {
     val puntos = integer("puntos").default(0)
     val fechaRegistro = varchar("fecha_registro", 30)
     val fotoPerfil = text("foto_perfil").nullable()
+    val rol = varchar("rol", 20).default("usuario")
+    val activo = bool("activo").default(true)
+    val notificaciones = bool("notificaciones").default(true)
 }

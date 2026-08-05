@@ -35,6 +35,28 @@ class ChatRepository {
         }[Chats.id].value
     }
 
+    fun crearDirecto(usuario1Id: Int, usuario2Id: Int, fecha: String): Int = transaction {
+        val existente = Chats
+            .selectAll()
+            .where {
+                (Chats.propuestaId.isNull()) and
+                    (((Chats.usuario1Id eq usuario1Id) and (Chats.usuario2Id eq usuario2Id)) or
+                        ((Chats.usuario1Id eq usuario2Id) and (Chats.usuario2Id eq usuario1Id)))
+            }
+            .limit(1)
+            .firstOrNull()
+
+        if (existente != null) {
+            return@transaction existente[Chats.id].value
+        }
+
+        Chats.insert {
+            it[Chats.usuario1Id] = usuario1Id
+            it[Chats.usuario2Id] = usuario2Id
+            it[fechaCreacion] = fecha
+        }[Chats.id].value
+    }
+
     fun obtenerPorPropuesta(propuestaId: Int): Chat? = transaction {
         Chats
             .selectAll()

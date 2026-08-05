@@ -21,5 +21,9 @@ data class Usuario(
     val fechaRegistro: String,
 
     @SerialName("foto_perfil")
-    val fotoPerfil: String? = null
+    val fotoPerfil: String? = null,
+
+    val rol: String = "usuario",
+
+    val activo: Boolean = true
 )

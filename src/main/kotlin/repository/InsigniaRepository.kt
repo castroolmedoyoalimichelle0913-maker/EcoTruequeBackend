@@ -99,6 +99,13 @@ class InsigniaRepository {
             ?.get(Usuarios.puntos) ?: 0
     }
 
+    fun contarInsigniasUsuario(usuarioId: Int): Int = transaction {
+        UsuarioInsignias
+            .selectAll()
+            .where { UsuarioInsignias.usuarioId eq usuarioId }
+            .count().toInt()
+    }
+
     private fun rowToInsignia(row: ResultRow): Insignia {
         return Insignia(
             id = row[Insignias.id].value,

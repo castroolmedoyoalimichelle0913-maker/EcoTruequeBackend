@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.routes.adminRoutes
 import com.example.routes.chatRoutes
 import com.example.routes.insigniaRoutes
 import com.example.routes.materialRoutes
@@ -26,6 +27,7 @@ fun Application.configureRouting() {
         chatRoutes()
         notificacionRoutes()
         insigniaRoutes()
+        adminRoutes()
 
         authenticate("auth-jwt") {
             get("/perfil") {

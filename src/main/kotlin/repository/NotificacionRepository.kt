@@ -8,6 +8,16 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class NotificacionRepository {
 
+    fun crearSiActivadas(usuarioId: Int, tipo: String, titulo: String, mensaje: String, fecha: String) {
+        try {
+            val usuarioRepository = UsuarioRepository()
+            if (usuarioRepository.tieneNotificaciones(usuarioId)) {
+                crear(usuarioId, tipo, titulo, mensaje, fecha)
+            }
+        } catch (_: Exception) {
+        }
+    }
+
     fun crear(usuarioId: Int, tipo: String, titulo: String, mensaje: String, fecha: String): Int = transaction {
         Notificaciones.insert {
             it[Notificaciones.usuarioId] = usuarioId

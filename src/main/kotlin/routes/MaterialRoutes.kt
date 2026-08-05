@@ -43,6 +43,39 @@ fun Route.materialRoutes() {
                 }
             }
 
+            get("/buscar") {
+                try {
+                    val query = call.request.queryParameters["q"]
+                    val categoria = call.request.queryParameters["categoria"]
+                    val puntosMin = call.request.queryParameters["puntosMin"]?.toIntOrNull()
+                    val puntosMax = call.request.queryParameters["puntosMax"]?.toIntOrNull()
+                    val desde = call.request.queryParameters["desde"]
+                    val hasta = call.request.queryParameters["hasta"]
+                    val lat = call.request.queryParameters["lat"]?.toDoubleOrNull()
+                    val lng = call.request.queryParameters["lng"]?.toDoubleOrNull()
+                    val distancia = call.request.queryParameters["distanciaKm"]?.toDoubleOrNull()
+
+                    val resultado = repository.buscar(
+                        query = query,
+                        categoria = categoria,
+                        puntosMin = puntosMin,
+                        puntosMax = puntosMax,
+                        desde = desde,
+                        hasta = hasta,
+                        lat = lat,
+                        lng = lng,
+                        distanciaKm = distancia
+                    )
+
+                    call.respond(resultado)
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al buscar materiales: ${e.message}")
+                    )
+                }
+            }
+
             get("/{id}") {
                 val id = call.parameters["id"]?.toIntOrNull()
 
