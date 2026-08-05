@@ -242,7 +242,7 @@ fun Route.adminRoutes() {
                         )
                     )
 
-                    call.respond(HttpStatusCode.Created, mapOf("id" to id, "mensaje" to "Reporte enviado"))
+                    call.respond(HttpStatusCode.Created, mapOf("mensaje" to "Reporte enviado"))
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,

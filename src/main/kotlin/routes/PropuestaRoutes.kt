@@ -97,7 +97,7 @@ fun Route.propuestaRoutes() {
                         fecha = ahora
                     )
 
-                    call.respond(HttpStatusCode.Created, mapOf("id" to id, "mensaje" to "Propuesta enviada"))
+                    call.respond(HttpStatusCode.Created, mapOf("mensaje" to "Propuesta enviada"))
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
