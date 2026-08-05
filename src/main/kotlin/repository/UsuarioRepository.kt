@@ -139,4 +139,18 @@ class UsuarioRepository {
     fun eliminar(id: Int): Boolean = transaction {
         Usuarios.deleteWhere { Usuarios.id eq id } > 0
     }
+
+    fun existeAdmin(): Boolean = transaction {
+        Usuarios
+            .select(Usuarios.rol)
+            .where { Usuarios.rol eq "admin" }
+            .limit(1)
+            .count() > 0
+    }
+
+    fun setRol(id: Int, rol: String): Boolean = transaction {
+        Usuarios.update({ Usuarios.id eq id }) {
+            it[Usuarios.rol] = rol
+        } > 0
+    }
 }

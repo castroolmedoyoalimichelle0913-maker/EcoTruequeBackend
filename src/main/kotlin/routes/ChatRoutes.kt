@@ -63,7 +63,15 @@ fun Route.chatRoutes() {
                     return@get
                 }
 
-                val chat = repository.obtenerPorPropuesta(propuestaId)
+                val chat = try {
+                    repository.obtenerPorPropuesta(propuestaId)
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al obtener chat: ${e.message}")
+                    )
+                    return@get
+                }
                 if (chat == null) {
                     call.respond(HttpStatusCode.NotFound, mapOf("error" to "Chat no encontrado"))
                     return@get

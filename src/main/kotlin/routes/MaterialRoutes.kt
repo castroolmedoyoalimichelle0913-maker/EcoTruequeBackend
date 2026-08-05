@@ -84,7 +84,15 @@ fun Route.materialRoutes() {
                     return@get
                 }
 
-                val material = repository.obtenerPorId(id)
+                val material = try {
+                    repository.obtenerPorId(id)
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Error al obtener material: ${e.message}")
+                    )
+                    return@get
+                }
 
                 if (material == null) {
                     call.respond(HttpStatusCode.NotFound, mapOf("error" to "Material no encontrado"))

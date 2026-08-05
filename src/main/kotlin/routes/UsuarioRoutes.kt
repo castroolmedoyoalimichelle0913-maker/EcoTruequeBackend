@@ -55,6 +55,12 @@ fun Route.usuarioRoutes() {
 
                 repository.registrar(usuario.copy(rol = "usuario", activo = true))
 
+                if (!repository.existeAdmin()) {
+                    repository.buscarPorCorreo(usuario.correo)?.let {
+                        repository.setRol(it[Usuarios.id].value, "admin")
+                    }
+                }
+
                 bitacoraRepository.registrar(
                     usuarioId = null,
                     correo = usuario.correo,

@@ -29,7 +29,9 @@ fun Application.configureSecurity() {
 
             validate { credential ->
 
-                if (credential.payload.getClaim("correo").asString() != "")
+                val correo = credential.payload.getClaim("correo").asString()
+
+                if (!correo.isNullOrBlank())
                     JWTPrincipal(credential.payload)
                 else
                     null

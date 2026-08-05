@@ -16,7 +16,7 @@ class InsigniaRepository {
         transaction {
             val existe = Insignias
                 .selectAll()
-                .where { Insignias.requerimiento eq requerimiento }
+                .where { Insignias.nombre eq nombre }
                 .limit(1)
                 .count() > 0
 
@@ -36,13 +36,12 @@ class InsigniaRepository {
         Insignias.selectAll().map { rowToInsignia(it) }
     }
 
-    fun obtenerPorRequerimiento(requerimiento: String): Int? = transaction {
+    fun obtenerPorRequerimiento(requerimiento: String): List<Int> = transaction {
         Insignias
             .selectAll()
             .where { Insignias.requerimiento eq requerimiento }
-            .limit(1)
-            .firstOrNull()
-            ?.get(Insignias.id)?.value
+            .orderBy(Insignias.cantidadRequerida)
+            .map { it[Insignias.id].value }
     }
 
     fun obtenerInsigniasUsuario(usuarioId: Int): Map<Int, String> = transaction {

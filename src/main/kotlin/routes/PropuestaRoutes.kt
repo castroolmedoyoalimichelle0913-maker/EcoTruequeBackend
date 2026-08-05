@@ -295,8 +295,8 @@ fun recompensarInsignias(usuarioId: Int, insigniaRepository: InsigniaRepository,
     )
 
     candidatas.forEach { (requerimiento, cantidad) ->
-        val insigniaId = insigniaRepository.obtenerPorRequerimiento(requerimiento)
-        if (insigniaId != null) {
+        val ids = insigniaRepository.obtenerPorRequerimiento(requerimiento)
+        ids.forEach { insigniaId ->
             val insignia = insigniaRepository.obtenerTodas().firstOrNull { it.id == insigniaId }
             if (insignia != null && cantidad >= insignia.cantidadRequerida) {
                 insigniaRepository.asignar(usuarioId, insigniaId, fecha)

@@ -92,59 +92,38 @@ object DatabaseFactory {
             } catch (_: Exception) {}
 
             try {
-                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS latitud DOUBLE NULL")
-                application.log.info("Columna latitud agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS longitud DOUBLE NULL")
-                application.log.info("Columna longitud agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS usuario_id INT NULL")
-                application.log.info("Columna usuario_id agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS fecha_publicacion VARCHAR(30) DEFAULT ''")
-                application.log.info("Columna fecha_publicacion agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS foto_perfil TEXT NULL")
-                application.log.info("Columna foto_perfil agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS rol VARCHAR(20) DEFAULT 'usuario'")
-                application.log.info("Columna rol agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS activo BOOLEAN DEFAULT TRUE")
-                application.log.info("Columna activo agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS notificaciones BOOLEAN DEFAULT TRUE")
-                application.log.info("Columna notificaciones agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS etiquetas VARCHAR(255) DEFAULT ''")
-                application.log.info("Columna etiquetas agregada")
-            } catch (_: Exception) {}
-
-            try {
-                exec("ALTER TABLE materiales ADD COLUMN IF NOT EXISTS estado VARCHAR(30) DEFAULT 'disponible'")
-                application.log.info("Columna estado agregada")
-            } catch (_: Exception) {}
-
-            try {
                 exec("ALTER TABLE chats MODIFY COLUMN propuesta_id INT NULL")
                 application.log.info("Columna propuesta_id de chats ahora es nullable")
             } catch (_: Exception) {}
+
+            fun asegurarColumna(tabla: String, columna: String, definicion: String) {
+                try {
+                    val existe = exec(
+                        "SELECT COUNT(*) FROM information_schema.COLUMNS " +
+                            "WHERE TABLE_SCHEMA = DATABASE() " +
+                            "AND TABLE_NAME = '$tabla' " +
+                            "AND COLUMN_NAME = '$columna'"
+                    ) { rs -> rs.next() && rs.getInt(1) > 0 }
+
+                    if (existe != true) {
+                        exec("ALTER TABLE $tabla ADD COLUMN $definicion")
+                        application.log.info("Columna $tabla.$columna agregada")
+                    }
+                } catch (e: Exception) {
+                    application.log.warn("No se pudo asegurar columna $tabla.$columna: ${e.message}")
+                }
+            }
+
+            asegurarColumna("materiales", "latitud", "DOUBLE NULL")
+            asegurarColumna("materiales", "longitud", "DOUBLE NULL")
+            asegurarColumna("materiales", "usuario_id", "INT NULL")
+            asegurarColumna("materiales", "fecha_publicacion", "VARCHAR(30) DEFAULT ''")
+            asegurarColumna("materiales", "etiquetas", "VARCHAR(255) DEFAULT ''")
+            asegurarColumna("materiales", "estado", "VARCHAR(30) DEFAULT 'disponible'")
+            asegurarColumna("usuarios", "foto_perfil", "TEXT NULL")
+            asegurarColumna("usuarios", "rol", "VARCHAR(20) DEFAULT 'usuario'")
+            asegurarColumna("usuarios", "activo", "BOOLEAN DEFAULT TRUE")
+            asegurarColumna("usuarios", "notificaciones", "BOOLEAN DEFAULT TRUE")
         }
 
         transaction {
@@ -195,6 +174,18 @@ object DatabaseFactory {
             } catch (e: Exception) {
                 application.log.warn("No se pudieron crear insignias: ${e.message}")
             }
+        }
+
+        try {
+            val adminCorreo = System.getenv("ADMIN_CORREO")
+            if (!adminCorreo.isNullOrBlank()) {
+                transaction {
+                    exec("UPDATE usuarios SET rol = 'admin' WHERE correo = '$adminCorreo'")
+                }
+                application.log.info("Rol admin asegurado para $adminCorreo")
+            }
+        } catch (e: Exception) {
+            application.log.warn("No se pudo asegurar rol admin: ${e.message}")
         }
 
         application.log.info("Base de datos conectada correctamente")
